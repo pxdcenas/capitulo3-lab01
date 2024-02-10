@@ -19,10 +19,22 @@ import java.util.List;
         @NamedQuery(name = "Empleado.listarTodos", query = "SELECT e FROM Empleado e"),
         @NamedQuery(name = "Empleado.listarTodos2", query = "SELECT e FROM Empleado e"),
         @NamedQuery(name = "Empleado.listarTodos3", query = "SELECT e FROM Empleado e"),
+        // Querys nombradas con parametros
+        @NamedQuery(name = "Empleado.buscarPorSueldo", query = "SELECT e FROM Empleado e WHERE e.sueldo > ?1"),
+        @NamedQuery(name = "Empleado.buscarPorSueldo2", query = "SELECT e FROM Empleado e WHERE e.sueldo > :sueldo"),
+
+        @NamedQuery(name = "Empleado.buscarPorFechaNacimiento", query = "SELECT e FROM Empleado e WHERE e.fechaNacimiento BETWEEN :fechaInicio AND :fechaFin")
 })
 //@NamedNativeQuery(name = "Empleado.listar", query = "SELECT * FROM tbl_empleados", resultClass = Empleado.class)
 @NamedNativeQueries({
         @NamedNativeQuery(name = "Empleado.listar", query = "SELECT * FROM tbl_empleados", resultClass = Empleado.class)
+})
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(
+                name = "Empleado.ObtenerEmpleadoPorId",
+                procedureName = "ObtenerEmpleadoPorId", parameters = {
+                @StoredProcedureParameter(mode = ParameterMode.IN, name = "_id", type = Long.class)
+        })
 })
 public class Empleado {
 

@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -128,5 +129,47 @@ class EmpleadoJpaTests {
         entityManager.remove(empleadoEncontrado);
         Empleado empleadoEliminado = entityManager.find(Empleado.class, 6);
         assertThat(empleadoEliminado).isNull();
+    }
+
+    @Test
+    void testBuscarEmpleadoPorSueldoParametroPosicion(){
+        BigDecimal sueldo = new BigDecimal("5000.00");
+        List<Empleado> empleados = entityManager.getEntityManager().createNamedQuery("Empleado.buscarPorSueldo", Empleado.class)
+                .setParameter(1, sueldo)
+                .getResultList();
+        assertThat(empleados).isNotEmpty();
+        assertThat(empleados).hasSize(3);
+    }
+
+    @Test
+    void testBuscarEmpleadoPorSueldoParametroSueldo(){
+        BigDecimal sueldo = new BigDecimal("5000.00");
+        List<Empleado> empleados = entityManager.getEntityManager().createNamedQuery("Empleado.buscarPorSueldo2", Empleado.class)
+                .setParameter("sueldo", sueldo)
+                .getResultList();
+        assertThat(empleados).isNotEmpty();
+        assertThat(empleados).hasSize(3);
+    }
+
+    @Test
+    void testBuscarEmpleadoPorFechaDeNacimiento(){
+        LocalDate fechaInicio = LocalDate.of(1990,1,1);
+        LocalDate fechaFin = LocalDate.of(1995,12,31);
+        List<Empleado> empleados = entityManager.getEntityManager().createNamedQuery("Empleado.buscarPorFechaNacimiento", Empleado.class)
+                .setParameter("fechaInicio", fechaInicio)
+                .setParameter("fechaFin", fechaFin)
+                .getResultList();
+        assertThat(empleados).isNotEmpty();
+        assertThat(empleados).hasSize(3);
+    }
+
+    @Test
+    void testBuscarEmpleadoPorIdStoreProcedure(){
+        Optional<Empleado> empleadoEncontrado = entityManager.getEntityManager().createNamedStoredProcedureQuery("Empleado.ObtenerEmpleadoPorId")
+                        .setParameter("_id", 5)
+                                .getResultList().stream().findFirst();
+        assertTrue(empleadoEncontrado.isPresent());
+        //assertThat(empleadoEncontrado).isNotNull();
+        assertThat(empleadoEncontrado.get().getNombres()).isEqualTo("Dany");
     }
 }
