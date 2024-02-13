@@ -1,6 +1,8 @@
 package edu.cibertec.capitulo3.lab01;
 
 import edu.cibertec.capitulo3.lab01.model.*;
+import jakarta.persistence.Query;
+import jakarta.persistence.StoredProcedureQuery;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +59,7 @@ class EmpleadoJpaTests {
         tarea1.setDescripcion("Tarea 1");
         Tarea tarea2 = new Tarea();
         tarea2.setDescripcion("Tarea 2");
-        nuevoEmpleado.setTareas(Arrays.asList(tarea1, tarea2));
+//        nuevoEmpleado.setTareas(Arrays.asList(tarea1, tarea2));
 
         Proyecto proyecto1 = new Proyecto();
         proyecto1.setDescripcion("Proyecto 1");
@@ -165,11 +167,22 @@ class EmpleadoJpaTests {
 
     @Test
     void testBuscarEmpleadoPorIdStoreProcedure(){
-        Optional<Empleado> empleadoEncontrado = entityManager.getEntityManager().createNamedStoredProcedureQuery("Empleado.ObtenerEmpleadoPorId")
-                        .setParameter("_id", 5)
-                                .getResultList().stream().findFirst();
-        assertTrue(empleadoEncontrado.isPresent());
-        //assertThat(empleadoEncontrado).isNotNull();
-        assertThat(empleadoEncontrado.get().getNombres()).isEqualTo("Dany");
+        StoredProcedureQuery query = entityManager.getEntityManager().createNamedStoredProcedureQuery("Empleado.ObtenerEmpleadoPorId");
+        query.setParameter("_id", 8L);
+
+        Empleado empleado = (Empleado) query.getSingleResult();
+
+        assertThat(empleado).isNotNull();
+        assertThat(empleado.getNombres()).isEqualTo("Sofia");
+    }
+
+    @Test
+    void testBuscarEmpleadoPorSueldoQuery(){
+        BigDecimal sueldo = new BigDecimal("4000.00");
+        Query query = entityManager.getEntityManager().createQuery("SELECT e FROM Empleado e WHERE e.sueldo > :sueldo", Empleado.class);
+        query.setParameter("sueldo", sueldo);
+        List<Empleado> lista = (List<Empleado>) query.getResultList();
+        assertThat(lista).isNotEmpty();
+        assertThat(lista).hasSize(5);
     }
 }

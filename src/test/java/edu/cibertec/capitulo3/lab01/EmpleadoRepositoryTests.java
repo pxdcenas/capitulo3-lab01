@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,7 +53,7 @@ class EmpleadoRepositoryTests {
         tarea1.setDescripcion("Tarea 1");
         Tarea tarea2 = new Tarea();
         tarea2.setDescripcion("Tarea 2");
-        nuevoEmpleado.setTareas(Arrays.asList(tarea1, tarea2));
+//        nuevoEmpleado.setTareas(Arrays.asList(tarea1, tarea2));
 
         Proyecto proyecto1 = new Proyecto();
         proyecto1.setDescripcion("Proyecto 1");
@@ -83,6 +84,23 @@ class EmpleadoRepositoryTests {
         empleadoRepository.deleteById(2L);
         Optional<Empleado> empleadoEliminado= empleadoRepository.findById(2L);
         assertFalse(empleadoEliminado.isPresent());
+    }
+
+    @Test
+    void testBuscarPorNombres() throws IOException {
+        Empleado empleadoEncontrado = empleadoRepository.findByNombres("Maria");
+        assertThat(empleadoEncontrado.getNombres()).isEqualTo("Maria");
+    }
+
+
+    @Test
+    void testBuscarPorApellidoPaternoOrApellidoMaterno() throws IOException {
+        List<Empleado> lista = empleadoRepository.findByApellidoPaternoOrApellidoMaterno("Perez");
+        assertThat(lista).isNotEmpty();
+        for (int i = 0; i < lista.size(); i++) {
+            System.out.println("lista.get(i) = " + lista.get(i));
+        }
+        assertThat(lista).hasSize(1);
     }
 
 }

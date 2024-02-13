@@ -1,5 +1,6 @@
 package edu.cibertec.capitulo3.lab01.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +35,9 @@ import java.util.List;
                 name = "Empleado.ObtenerEmpleadoPorId",
                 procedureName = "ObtenerEmpleadoPorId", parameters = {
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "_id", type = Long.class)
-        })
+                },
+                resultClasses = Empleado.class
+        )
 })
 public class Empleado {
 
@@ -77,10 +80,10 @@ public class Empleado {
     @JoinColumn(nullable = false)
     private Departamento departamento;
 
-    @OneToMany(mappedBy = "empleado", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "empleado", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<Tarea> tareas;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<Proyecto> proyectos;
 
 }
