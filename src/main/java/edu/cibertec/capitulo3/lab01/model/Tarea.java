@@ -1,15 +1,15 @@
 package edu.cibertec.capitulo3.lab01.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Table(name = "tbl_tareas")
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class Tarea {
 
     @Id
@@ -19,5 +19,7 @@ public class Tarea {
 
     @ManyToOne
     @JoinColumn(name = "empleado_id")
+    @ToString.Exclude
     private Empleado empleado;
+
 }

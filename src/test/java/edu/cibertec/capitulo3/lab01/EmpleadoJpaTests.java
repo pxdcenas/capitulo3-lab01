@@ -185,4 +185,15 @@ class EmpleadoJpaTests {
         assertThat(lista).isNotEmpty();
         assertThat(lista).hasSize(5);
     }
+
+    @Test
+    void testEmpleadosFetch() throws IOException {
+        Empleado empleado = entityManager.find(Empleado.class, 1L);
+        System.out.println("empleado = " + empleado);
+        assertThat(empleado).isNotNull();
+        assertThat(empleado.getDepartamento()).isNotNull();
+        assertThat(empleado.getEstacionamiento()).isNotNull();
+        System.out.println("tareas = " + empleado.getTareas());
+        System.out.println("proyectos = " + empleado.getProyectos());
+    }
 }

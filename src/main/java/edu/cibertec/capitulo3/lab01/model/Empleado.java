@@ -72,17 +72,21 @@ public class Empleado {
     @Embedded
     private EmpleadoDetalle empleadoDetalle;
 
+    // Valor por defecto fetch = FetchType.EAGER
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(nullable = false, unique = true)
     private Estacionamiento estacionamiento;
 
+    // Valor por defecto fetch = FetchType.EAGER
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(nullable = false)
     private Departamento departamento;
 
+    // Valor por defecto fetch = FetchType.LAZY
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<Tarea> tareas;
 
+    // Valor por defecto fetch = FetchType.LAZY
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<Proyecto> proyectos;
 

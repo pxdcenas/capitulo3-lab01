@@ -2,11 +2,14 @@ package edu.cibertec.capitulo3.lab01;
 
 
 import edu.cibertec.capitulo3.lab01.model.*;
+import edu.cibertec.capitulo3.lab01.repository.DepartamentoRepository;
 import edu.cibertec.capitulo3.lab01.repository.EmpleadoRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -14,18 +17,21 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class EmpleadoRepositoryTests {
 
     @Autowired
     private EmpleadoRepository empleadoRepository;
+
+    @Autowired
+    private DepartamentoRepository deparamentoRepository;
 
     @Test
     void testGuardarEmpleado() throws IOException {
@@ -92,6 +98,29 @@ class EmpleadoRepositoryTests {
         assertThat(empleadoEncontrado.getNombres()).isEqualTo("Maria");
     }
 
+    @Test
+    void testListarEmpleados() throws IOException {
+        List<Empleado> lista = empleadoRepository.listarEmpleados();
+        for (int i = 0; i <lista.size(); i++) {
+            System.out.println("lista = " + lista.get(i));
+        }
+        assertThat(lista).isNotEmpty();
+        assertThat(lista).hasSize(10);
+    }
+
+    @Test
+    void testEmpleadosFetch() throws IOException {
+        Empleado empleado = empleadoRepository.findById(1L).orElse(null);
+        System.out.println("empleado = " + empleado);
+        assertThat(empleado).isNotNull();
+        assertThat(empleado.getDepartamento()).isNotNull();
+        assertThat(empleado.getEstacionamiento()).isNotNull();
+        System.out.println("tareas = " + empleado.getTareas());
+        System.out.println("proyectos = " + empleado.getProyectos());
+        assertThat(empleado.getTareas()).isNotEmpty();
+        assertThat(empleado.getProyectos()).isNotEmpty();
+    }
+
 
     @Test
     void testBuscarPorApellidoPaternoOrApellidoMaterno() throws IOException {
@@ -100,7 +129,67 @@ class EmpleadoRepositoryTests {
         for (int i = 0; i < lista.size(); i++) {
             System.out.println("lista.get(i) = " + lista.get(i));
         }
-        assertThat(lista).hasSize(1);
+        assertThat(lista).hasSize(2);
     }
+
+    @Test
+    void testListarEmpleadosFechaDeNacimientoAntesDe() throws IOException {
+        List<Empleado> lista = empleadoRepository.findByFechaNacimientoBefore(LocalDate.of(1999, 1, 1));
+        assertThat(lista).hasSize(8);
+    }
+
+    @Test
+    void testListarEmpleadosSueldoEntre() throws IOException {
+        BigDecimal sueldoMin = new BigDecimal(3500);
+        BigDecimal sueldoMax = new BigDecimal(5500);
+        List<Empleado> lista = empleadoRepository.findBySueldoBetween(sueldoMin, sueldoMax);
+        assertThat(lista).hasSize(5);
+    }
+
+    @Test
+    void testListarEmpleadosFechaDeNacimientoEntre() throws IOException {
+        LocalDate fechaInicio = LocalDate.of(1987,1,1);
+        LocalDate fechaFin = LocalDate.of(1999,12,31);
+        List<Empleado> lista = empleadoRepository.findByFechaNacimientoBetween(fechaInicio, fechaFin);
+        assertThat(lista).hasSize(5);
+    }
+
+    @Test
+    void testListarEmpleadosQueNombreContiene() throws IOException {
+        List<Empleado> lista = empleadoRepository.findByNombresLike("%ar%");
+        assertThat(lista).hasSize(3);
+    }
+
+    @Test
+    void testListarEmpleadosPorDepartamento() throws IOException {
+        Departamento departamento = deparamentoRepository.findById(2L).orElse(null);
+        List<Empleado> lista = empleadoRepository.findByDepartamentoOrderByApellidoPaterno(departamento);
+        assertThat(lista).hasSize(3);
+    }
+
+
+    @Test
+    void testPagination() throws IOException {
+        PageRequest pageRequest = PageRequest.of(0, 5);
+        Page<Empleado> pageEmpleados = empleadoRepository.findAll(pageRequest);
+        assertThat(pageEmpleados.getContent()).hasSize(10);
+    }
+
+    @Test
+    void testPaginationPorApellidoPaterno() throws IOException {
+        // Orden ascendente
+        PageRequest pageRequest = PageRequest.of(0, 5, Sort.by("apellidoPaterno"));
+        Page<Empleado> pageEmpleados = empleadoRepository.findAll(pageRequest);
+        assertThat(pageEmpleados.getContent()).isSortedAccordingTo(Comparator.comparing(Empleado::getApellidoPaterno));
+    }
+
+    @Test
+    void testPaginationPorApellidoPaterno2() throws IOException {
+        // Orden descendente
+        PageRequest pageRequest = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "apellidoPaterno"));
+        Page<Empleado> pageEmpleados = empleadoRepository.findAll(pageRequest);
+        assertEquals(5, pageEmpleados.getSize());
+    }
+
 
 }
