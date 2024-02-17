@@ -83,11 +83,11 @@ public class Empleado {
     private Departamento departamento;
 
     // Valor por defecto fetch = FetchType.LAZY
-    @OneToMany(mappedBy = "empleado", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "empleado", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<Tarea> tareas;
 
     // Valor por defecto fetch = FetchType.LAZY
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<Proyecto> proyectos;
 
 }

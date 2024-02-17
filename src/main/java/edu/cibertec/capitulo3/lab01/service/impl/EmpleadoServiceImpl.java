@@ -6,11 +6,19 @@ import edu.cibertec.capitulo3.lab01.service.EmpleadoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class EmpleadoServiceImpl implements EmpleadoService {
 
     @Autowired
     private EmpleadoRepository empleadoRepository;
+
+    @Override
+    public List<Empleado> listarTodos() {
+        return empleadoRepository.findAll();
+    }
+
     @Override
     public Empleado registrarEmpleado(Empleado empleado) {
         return empleadoRepository.save(empleado);

@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -113,10 +114,33 @@ class EmpleadoRepositoryTests {
         Empleado empleado = empleadoRepository.findById(1L).orElse(null);
         System.out.println("empleado = " + empleado);
         assertThat(empleado).isNotNull();
+        // EAGER: Carga todos los datos relacionados
         assertThat(empleado.getDepartamento()).isNotNull();
         assertThat(empleado.getEstacionamiento()).isNotNull();
+        // LAZY: No carga los datos relacionados
         System.out.println("tareas = " + empleado.getTareas());
         System.out.println("proyectos = " + empleado.getProyectos());
+        assertThat(empleado.getTareas()).isNotEmpty();
+        assertThat(empleado.getProyectos()).isNotEmpty();
+    }
+
+    @Test
+    @Transactional
+    void testEmpleadosFetch2() throws IOException {
+        Empleado empleado = empleadoRepository.findById(1L).orElse(null);
+        // LAZY: @Transactional mantiene la sesión de hibernate
+        System.out.println("tareas = " + empleado.getTareas().size());
+        System.out.println("proyectos = " + empleado.getProyectos().size());
+        assertThat(empleado.getTareas()).isNotEmpty();
+        assertThat(empleado.getProyectos()).isNotEmpty();
+    }
+
+    @Test
+    void testEmpleadosFetchTareasYProyectos() throws IOException {
+        Empleado empleado = empleadoRepository.obtenerTareasYProyectos(1L);
+        // LAZY: empleadoRepository en obtenerTareasYProyectos() tiene @Transactional
+        System.out.println("tareas = " + empleado.getTareas().size());
+        System.out.println("proyectos = " + empleado.getProyectos().size());
         assertThat(empleado.getTareas()).isNotEmpty();
         assertThat(empleado.getProyectos()).isNotEmpty();
     }

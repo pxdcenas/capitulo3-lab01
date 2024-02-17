@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -32,5 +33,15 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
     List<Empleado> findByNombresLike(String abc);
 
     List<Empleado> findByDepartamentoOrderByApellidoPaterno(Departamento departamento);
+
+    @Transactional
+    default Empleado obtenerTareasYProyectos(Long id){
+        Empleado empleado = this.findById(id).orElse(null);
+        if (empleado != null) {
+            empleado.getTareas().size(); // Accede la collection para cargarla
+            empleado.getProyectos().size(); // Accede la collection para cargarla
+        }
+        return empleado;
+    }
 
 }
