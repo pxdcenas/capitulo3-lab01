@@ -15,7 +15,7 @@ public class EmpleadoController {
     private EmpleadoService empleadoService;
 
     @GetMapping("/listar")
-    public String listar(){
+    public String listarProductos(){
         List<Empleado> lista = empleadoService.listarTodos();
         return "productos/listar";
     }
